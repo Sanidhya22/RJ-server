@@ -9,7 +9,10 @@ config = Config()
 
 ema_confluence = "@onlyemaconfluence"
 pivot_ema_confluence = "@pivot_ema_confluence"
-ema_volume_confluence = "@volumeemaconfluence"
+
+price_volume_analysis = '@price_volume_analysis'
+wklyvol_emaconfluence = '@wklyvol_emaconfluence'
+dlyvol_emaconfluence = '@dlyvol_emaconfluence'
 
 
 @app.route('/telegramWekhook', methods=['POST'])
@@ -32,10 +35,20 @@ def telegramAlertShort():
                 message = f"{tradingsymbol} \nPrice={execute_at}"
                 url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={pivot_ema_confluence}&text={message}"
                 print(requests.get(url).json())
-        elif alertName == "volumeemaconfluence":
+        elif alertName == "price_volume_analysis":
             for tradingsymbol, execute_at in zip(stockName, place_at):
                 message = f"{tradingsymbol} \nPrice={execute_at}"
-                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={ema_volume_confluence}&text={message}"
+                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={price_volume_analysis}&text={message}"
+                print(requests.get(url).json())
+        elif alertName == "wklyvol_emaconfluence":
+            for tradingsymbol, execute_at in zip(stockName, place_at):
+                message = f"{tradingsymbol} \nPrice={execute_at}"
+                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={wklyvol_emaconfluence}&text={message}"
+                print(requests.get(url).json())
+        elif alertName == "dlyvol_emaconfluence":
+            for tradingsymbol, execute_at in zip(stockName, place_at):
+                message = f"{tradingsymbol} \nPrice={execute_at}"
+                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={dlyvol_emaconfluence}&text={message}"
                 print(requests.get(url).json())
 
     except Exception as e:
