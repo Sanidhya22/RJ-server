@@ -14,6 +14,7 @@ price_volume_analysis = '@price_volume_analysis'
 wklyvol_emaconfluence = '@wklyvol_emaconfluence'
 dlyvol_emaconfluence = '@dlyvol_emaconfluence'
 wklyvol_2times_6weeks = '@wklyvol_2times_6weeks'
+dlyvol_2times_7days = '@dlyvol_2times_7days'
 
 
 @app.route('/telegramWekhook', methods=['POST'])
@@ -55,6 +56,11 @@ def telegramAlertShort():
             for tradingsymbol, execute_at in zip(stockName, place_at):
                 message = f"{tradingsymbol} \nPrice={execute_at}"
                 url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={wklyvol_2times_6weeks}&text={message}"
+                print(requests.get(url).json())
+        elif alertName == "dlyvol_2times_7days":
+            for tradingsymbol, execute_at in zip(stockName, place_at):
+                message = f"{tradingsymbol} \nPrice={execute_at}"
+                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={dlyvol_2times_7days}&text={message}"
                 print(requests.get(url).json())
 
     except Exception as e:
