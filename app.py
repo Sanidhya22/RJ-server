@@ -71,7 +71,7 @@ def telegramAlertShort():
             for tradingsymbol, execute_at in zip(stockName, place_at):
                 message = f"{tradingsymbol} \nPrice={execute_at}"
                 url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={pivot_ema_confluence}&text={message}"
-                # print(requests.get(url).json())
+                print(requests.get(url).json())
             gsheet('pivot_ema_confluence', stockName)
         elif alertName == "price_volume_analysis":
             for tradingsymbol, execute_at in zip(stockName, place_at):
@@ -112,18 +112,48 @@ def telegramAlertShort():
 
 
 def gsheet(sheetName, list):
-    sheet = client.open('Rajesh Sheety Alerts').worksheet(sheetName)
-    cell = sheet.find(today)
+    sheet = client.open('Rajesh Sheety Alerts')
+    sheetOne = sheet.worksheet(sheetName)
+    sheetTwo = sheet.worksheet('Dashboard')
+    cell = sheetOne.find(today)
     if cell:
         print("Column with today's date already exists.")
     else:
-        sheet.insert_cols([None] * 1, col=2,
-                          value_input_option='RAW', inherit_from_before=False)
-        sheet.update_cell(1, 2, today)
-    next_row = len(sheet.col_values(2)) + 1
+        sheetOne.insert_cols([None] * 1, col=3,
+                             value_input_option='RAW', inherit_from_before=False)
+        sheetOne.update_cell(1, 3, today)
+    next_row = len(sheetOne.col_values(3)) + 1
 
-    range_to_update = f'B{next_row}:B{next_row + len(list) - 1}'
-    sheet.update([[value] for value in list], range_to_update)
+    range_to_update = f'C{next_row}:C{next_row + len(list) - 1}'
+    sheetOne.update([[value] for value in list], range_to_update)
+
+    if sheetName == 'emaconfluence':
+        range_to_update = f'A{next_row}:A{next_row + len(list) - 1}'
+        sheetTwo.update([[value] for value in list], range_to_update)
+
+    if sheetName == 'pivot_ema_confluence':
+        range_to_update = f'B{next_row}:B{next_row + len(list) - 1}'
+        sheetTwo.update([[value] for value in list], range_to_update)
+
+    if sheetName == 'price_volume_analysis':
+        range_to_update = f'C{next_row}:C{next_row + len(list) - 1}'
+        sheetTwo.update([[value] for value in list], range_to_update)
+
+    if sheetName == 'wklyvol_emaconfluence':
+        range_to_update = f'D{next_row}:D{next_row + len(list) - 1}'
+        sheetTwo.update([[value] for value in list], range_to_update)
+
+    if sheetName == 'dlyvol_emaconfluence':
+        range_to_update = f'E{next_row}:E{next_row + len(list) - 1}'
+        sheetTwo.update([[value] for value in list], range_to_update)
+    if sheetName == 'wklyvol_2times_6weeks':
+        range_to_update = f'F{next_row}:F{next_row + len(list) - 1}'
+        sheetTwo.update([[value] for value in list], range_to_update)
+
+    if sheetName == 'dlyvol_2times_7days':
+        range_to_update = f'G{next_row}:G{next_row + len(list) - 1}'
+        sheetTwo.update([[value] for value in list], range_to_update)
+
     return jsonify({"status": 200, "message": "Alert Successfully"})
 
 
