@@ -127,7 +127,7 @@ def gsheet(sheetName, list):
     range_to_update = f'C{next_row}:C{next_row + len(list) - 1}'
     sheetOne.update([[value] for value in list], range_to_update)
 
-    if sheetName == 'emaconfluence':
+    if sheetName == 'ema_confluence':
         range_to_update = f'A{next_row}:A{next_row + len(list) - 1}'
         sheetTwo.update([[value] for value in list], range_to_update)
 
