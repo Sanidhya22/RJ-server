@@ -41,7 +41,7 @@ config = Config()
 
 today = date.today().isoformat()
 
-ema_confluence = "@emaconfluence"
+ema_confluence = "@ema_confluence"
 pivot_ema_confluence = "@pivot_ema_confluence"
 
 price_volume_analysis = '@price_volume_analysis'
@@ -60,12 +60,12 @@ def telegramAlertShort():
         place_at = [float(o.strip())
                     for o in triggerPriceData.split(',')]
         stockName = [o for o in stocksData.split(',')]
-        if alertName == "emaconfluence":
+        if alertName == "ema_confluence":
             for tradingsymbol, execute_at in zip(stockName, place_at):
                 message = f"{tradingsymbol} \nPrice={execute_at}"
                 url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={ema_confluence}&text={message}"
                 print(requests.get(url).json())
-            gsheet('emaconfluence', stockName)
+            gsheet('ema_confluence', stockName)
 
         elif alertName == "pivot_ema_confluence":
             for tradingsymbol, execute_at in zip(stockName, place_at):
