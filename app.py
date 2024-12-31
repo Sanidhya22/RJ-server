@@ -58,7 +58,6 @@ dlyvol_2times_7days = '@dlyvol_2times_7days'
 
 @app.route('/telegramWekhook', methods=['POST'])
 def telegramAlertShort():
-    print(today)
     try:
         stocksData = request.json.get('stocks')
         triggerPriceData = request.json.get('trigger_prices')
@@ -129,9 +128,8 @@ def gsheet(sheetName, list):
         sheetOne.insert_cols([None] * 1, col=3,
                              value_input_option='RAW', inherit_from_before=False)
         sheetOne.update_cell(1, 3, today)
-
     if existing_date != today:
-        sheet.update_cell(1, 9, today)
+        sheetTwo.update_cell(1, 9, today)
         range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(100, 8)}'
         sheetTwo.batch_clear([range_to_clear])
     next_row = len(sheetOne.col_values(3)) + 1
