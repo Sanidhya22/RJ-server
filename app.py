@@ -6,7 +6,8 @@ from config import Config
 import gspread
 import pandas as pd
 from oauth2client.service_account import ServiceAccountCredentials
-from datetime import date
+from datetime import datetime
+from pytz import timezone
 
 # define the scope
 scope = ['https://spreadsheets.google.com/feeds',
@@ -39,7 +40,11 @@ client = gspread.authorize(creds)
 app = Flask(__name__)
 config = Config()
 
-today = date.today().isoformat()
+# today = date.today().isoformat()
+unformatted_date = datetime.now(timezone("Asia/Kolkata"))
+
+# Format the datetime object to a string in the format YYYY-MM-DD
+today = unformatted_date.strftime('%Y-%m-%d')
 
 ema_confluence = "@ema_confluence"
 pivot_ema_confluence = "@pivot_ema_confluence"
@@ -53,6 +58,7 @@ dlyvol_2times_7days = '@dlyvol_2times_7days'
 
 @app.route('/telegramWekhook', methods=['POST'])
 def telegramAlertShort():
+    print(today)
     try:
         stocksData = request.json.get('stocks')
         triggerPriceData = request.json.get('trigger_prices')
@@ -116,19 +122,25 @@ def gsheet(sheetName, list):
     sheetOne = sheet.worksheet(sheetName)
     sheetTwo = sheet.worksheet('Dashboard')
     cell = sheetOne.find(today)
+    existing_date = sheetTwo.cell(1, 9).value
     if cell:
         print("Column with today's date already exists.")
     else:
         sheetOne.insert_cols([None] * 1, col=3,
                              value_input_option='RAW', inherit_from_before=False)
         sheetOne.update_cell(1, 3, today)
+
+    if existing_date != today:
+        sheet.update_cell(1, 9, today)
+        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(100, 8)}'
+        sheetTwo.batch_clear([range_to_clear])
     next_row = len(sheetOne.col_values(3)) + 1
 
     range_to_update = f'C{next_row}:C{next_row + len(list) - 1}'
     sheetOne.update([[value] for value in list], range_to_update)
 
     if sheetName == 'ema_confluence':
-        range_to_update = f'A{next_row}:A{next_row + len(list) - 1}'
+        range_to_update = f'C{next_row}:C{next_row + len(list) - 1}'
         sheetTwo.update([[value] for value in list], range_to_update)
 
     if sheetName == 'pivot_ema_confluence':
@@ -136,22 +148,22 @@ def gsheet(sheetName, list):
         sheetTwo.update([[value] for value in list], range_to_update)
 
     if sheetName == 'price_volume_analysis':
-        range_to_update = f'C{next_row}:C{next_row + len(list) - 1}'
+        range_to_update = f'A{next_row}:A{next_row + len(list) - 1}'
         sheetTwo.update([[value] for value in list], range_to_update)
 
     if sheetName == 'wklyvol_emaconfluence':
-        range_to_update = f'D{next_row}:D{next_row + len(list) - 1}'
+        range_to_update = f'E{next_row}:E{next_row + len(list) - 1}'
         sheetTwo.update([[value] for value in list], range_to_update)
 
     if sheetName == 'dlyvol_emaconfluence':
-        range_to_update = f'E{next_row}:E{next_row + len(list) - 1}'
+        range_to_update = f'D{next_row}:D{next_row + len(list) - 1}'
         sheetTwo.update([[value] for value in list], range_to_update)
     if sheetName == 'wklyvol_2times_6weeks':
-        range_to_update = f'F{next_row}:F{next_row + len(list) - 1}'
+        range_to_update = f'G{next_row}:G{next_row + len(list) - 1}'
         sheetTwo.update([[value] for value in list], range_to_update)
 
     if sheetName == 'dlyvol_2times_7days':
-        range_to_update = f'G{next_row}:G{next_row + len(list) - 1}'
+        range_to_update = f'F{next_row}:F{next_row + len(list) - 1}'
         sheetTwo.update([[value] for value in list], range_to_update)
 
     return jsonify({"status": 200, "message": "Alert Successfully"})
