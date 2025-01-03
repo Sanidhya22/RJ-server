@@ -121,7 +121,7 @@ def gsheet(sheetName, list):
     sheetOne = sheet.worksheet(sheetName)
     sheetTwo = sheet.worksheet('Dashboard')
     cell = sheetOne.find(today)
-    existing_date = sheetTwo.cell(1, 9).value
+    existing_date = sheetTwo.cell(2, 9).value
     if cell:
         print("Column with today's date already exists.")
     else:
@@ -129,7 +129,7 @@ def gsheet(sheetName, list):
                              value_input_option='RAW', inherit_from_before=False)
         sheetOne.update_cell(1, 3, today)
     if existing_date != today:
-        sheetTwo.update_cell(1, 9, today)
+        sheetTwo.update_cell(2, 9, today)
         range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(100, 8)}'
         sheetTwo.batch_clear([range_to_clear])
     next_row = len(sheetOne.col_values(3)) + 1
