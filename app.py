@@ -124,13 +124,13 @@ def gsheet(sheetName, list):
     existing_date = sheetTwo.cell(2, 9).value
     if cell:
         print("Column with today's date already exists.")
-    else:
+    if cell == None:
         sheetOne.insert_cols([None] * 1, col=3,
                              value_input_option='RAW', inherit_from_before=False)
         sheetOne.update_cell(1, 3, today)
     if existing_date != today:
         sheetTwo.update_cell(2, 9, today)
-        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(100, 8)}'
+        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(250, 8)}'
         sheetTwo.batch_clear([range_to_clear])
     next_row = len(sheetOne.col_values(3)) + 1
 
