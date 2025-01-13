@@ -122,6 +122,7 @@ def gsheet(sheetName, list):
     sheetTwo = sheet.worksheet('Dashboard')
     cell = sheetOne.find(today)
     existing_date = sheetTwo.cell(2, 9).value
+    print(cell,today,existing_date)
     if cell:
         print("Column with today's date already exists.")
     if cell == None:
