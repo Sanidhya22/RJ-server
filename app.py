@@ -46,7 +46,7 @@ unformatted_date = datetime.now(timezone("Asia/Kolkata"))
 # Format the datetime object to a string in the format YYYY-MM-DD
 # today = unformatted_date.strftime('%Y-%m-%d')
 
-today = '2025-01-22'
+today = '2025-01-23'
 
 ema_confluence = "@ema_confluence"
 pivot_ema_confluence = "@pivot_ema_confluence"
@@ -120,7 +120,7 @@ def telegramAlertShort():
 
 
 def gsheet(sheetName, list):
-    sheet = client.open('Rajesh Sheetty Alerts')
+    sheet = client.open('Rajesh Shetty Alerts')
     sheetOne = sheet.worksheet(sheetName)
     sheetTwo = sheet.worksheet('Dashboard')
     cell = sheetOne.find(today)
