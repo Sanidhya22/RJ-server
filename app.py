@@ -112,19 +112,20 @@ def telegramAlertShort():
             gsheet("dlyvol_2times_7days", stockName)
 
     except Exception as e:
-        print(e)
+        print(
+            f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
         return jsonify({"status": 400, "message": "Something went wrong"})
 
     return jsonify({"status": 200, "message": "Alert Successfully"})
 
 
 def gsheet(sheetName, list):
-    sheet = client.open('Rajesh Sheety Alerts')
+    sheet = client.open('Rajesh Sheetty Alerts')
     sheetOne = sheet.worksheet(sheetName)
     sheetTwo = sheet.worksheet('Dashboard')
     cell = sheetOne.find(today)
     existing_date = sheetTwo.cell(2, 9).value
-    print(cell,today,unformatted_date,existing_date)
+    print(cell, today, unformatted_date, existing_date)
     if cell:
         print("Column with today's date already exists.")
     if cell == None:
