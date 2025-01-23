@@ -46,7 +46,7 @@ unformatted_date = datetime.now(timezone("Asia/Kolkata"))
 # Format the datetime object to a string in the format YYYY-MM-DD
 # today = unformatted_date.strftime('%Y-%m-%d')
 
-today = '2025-01-23'
+today = '2025-01-24'
 
 ema_confluence = "@ema_confluence"
 pivot_ema_confluence = "@pivot_ema_confluence"
