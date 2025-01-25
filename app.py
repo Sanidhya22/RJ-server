@@ -46,8 +46,6 @@ unformatted_date = datetime.now(timezone("Asia/Kolkata"))
 # Format the datetime object to a string in the format YYYY-MM-DD
 today = unformatted_date.strftime('%Y-%m-%d')
 
-# today = '2025-01-24'
-
 ema_confluence = "@ema_confluence"
 pivot_ema_confluence = "@pivot_ema_confluence"
 
@@ -57,20 +55,15 @@ dlyvol_emaconfluence = '@dlyvol_emaconfluence'
 wklyvol_2times_6weeks = '@wklyvol_2times_6weeks'
 dlyvol_2times_7days = '@dlyvol_2times_7days'
 
-
-@app.route('/test', methods=['GET'])
-def test():
-    sheet = client.open('Rajesh Shetty Alerts')
-    sheetOne = sheet.worksheet('ema_confluence')
-    cell = sheetOne.find(today)
-    sheetTwo = sheet.worksheet('Dashboard')
-    existing_date = sheetTwo.cell(2, 9).value
-    if cell:
-        temp = f"Undormatted date:{unformatted_date}, Today:{today} ,Existing date {existing_date} ,cell :{cell} , First If Block"
-        return jsonify({"status": 200, "message": temp})
-    if cell == None:
-        temp = f"Undormatted date:{unformatted_date}, Today:{today} ,Existing date {existing_date} ,cell :{cell} Second If block"
-        return jsonify({"status": 200, "message": temp})
+CHAT_IDS = {
+    "ema_confluence": ema_confluence,
+    "pivot_ema_confluence": pivot_ema_confluence,
+    "price_volume_analysis": price_volume_analysis,
+    "wklyvol_emaconfluence": wklyvol_emaconfluence,
+    "dlyvol_emaconfluence": dlyvol_emaconfluence,
+    "wklyvol_2times_6weeks": wklyvol_2times_6weeks,
+    "dlyvol_2times_7days": dlyvol_2times_7days
+}
 
 
 @app.route('/updateDate', methods=['GET'])
@@ -108,56 +101,70 @@ def updateCell():
 
 @app.route('/telegramWekhook', methods=['POST'])
 def telegramAlertShort():
+    # try:
+    #     stocksData = request.json.get('stocks')
+    #     triggerPriceData = request.json.get('trigger_prices')
+    #     alertName = request.json.get('alert_name')
+    #     place_at = [float(o.strip())
+    #                 for o in triggerPriceData.split(',')]
+    #     stockName = [o for o in stocksData.split(',')]
+    #     if alertName == "ema_confluence":
+    #         for tradingsymbol, execute_at in zip(stockName, place_at):
+    #             message = f"{tradingsymbol} \nPrice={execute_at}"
+    #             url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={ema_confluence}&text={message}"
+    #             print(requests.get(url).json())
+    #         gsheet('ema_confluence', stockName)
+
+    #     elif alertName == "pivot_ema_confluence":
+    #         for tradingsymbol, execute_at in zip(stockName, place_at):
+    #             message = f"{tradingsymbol} \nPrice={execute_at}"
+    #             url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={pivot_ema_confluence}&text={message}"
+    #             print(requests.get(url).json())
+    #         gsheet('pivot_ema_confluence', stockName)
+    #     elif alertName == "price_volume_analysis":
+    #         for tradingsymbol, execute_at in zip(stockName, place_at):
+    #             message = f"{tradingsymbol} \nPrice={execute_at}"
+    #             url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={price_volume_analysis}&text={message}"
+    #             print(requests.get(url).json())
+    #         gsheet('price_volume_analysis', stockName)
+    #     elif alertName == "wklyvol_emaconfluence":
+    #         for tradingsymbol, execute_at in zip(stockName, place_at):
+    #             message = f"{tradingsymbol} \nPrice={execute_at}"
+    #             url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={wklyvol_emaconfluence}&text={message}"
+    #             print(requests.get(url).json())
+    #         gsheet("wklyvol_emaconfluence", stockName)
+    #     elif alertName == "dlyvol_emaconfluence":
+    #         for tradingsymbol, execute_at in zip(stockName, place_at):
+    #             message = f"{tradingsymbol} \nPrice={execute_at}"
+    #             url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={dlyvol_emaconfluence}&text={message}"
+    #             print(requests.get(url).json())
+    #         gsheet("dlyvol_emaconfluence", stockName)
+    #     elif alertName == "wklyvol_2times_6weeks":
+    #         for tradingsymbol, execute_at in zip(stockName, place_at):
+    #             message = f"{tradingsymbol} \nPrice={execute_at}"
+    #             url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={wklyvol_2times_6weeks}&text={message}"
+    #             print(requests.get(url).json())
+    #         gsheet("wklyvol_2times_6weeks", stockName)
+    #     elif alertName == "dlyvol_2times_7days":
+    #         for tradingsymbol, execute_at in zip(stockName, place_at):
+    #             message = f"{tradingsymbol} \nPrice={execute_at}"
+    #             url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={dlyvol_2times_7days}&text={message}"
+    #             print(requests.get(url).json())
+    #         gsheet("dlyvol_2times_7days", stockName)
     try:
         stocksData = request.json.get('stocks')
         triggerPriceData = request.json.get('trigger_prices')
         alertName = request.json.get('alert_name')
-        place_at = [float(o.strip())
-                    for o in triggerPriceData.split(',')]
-        stockName = [o for o in stocksData.split(',')]
-        if alertName == "ema_confluence":
-            for tradingsymbol, execute_at in zip(stockName, place_at):
-                message = f"{tradingsymbol} \nPrice={execute_at}"
-                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={ema_confluence}&text={message}"
-                print(requests.get(url).json())
-            gsheet('ema_confluence', stockName)
+        place_at = [float(o.strip()) for o in triggerPriceData.split(',')]
+        stockName = [o.strip() for o in stocksData.split(',')]
 
-        elif alertName == "pivot_ema_confluence":
+        if alertName in CHAT_IDS:
+            chat_id = CHAT_IDS[alertName]
             for tradingsymbol, execute_at in zip(stockName, place_at):
                 message = f"{tradingsymbol} \nPrice={execute_at}"
-                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={pivot_ema_confluence}&text={message}"
+                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={chat_id}&text={message}"
                 print(requests.get(url).json())
-            gsheet('pivot_ema_confluence', stockName)
-        elif alertName == "price_volume_analysis":
-            for tradingsymbol, execute_at in zip(stockName, place_at):
-                message = f"{tradingsymbol} \nPrice={execute_at}"
-                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={price_volume_analysis}&text={message}"
-                print(requests.get(url).json())
-            gsheet('price_volume_analysis', stockName)
-        elif alertName == "wklyvol_emaconfluence":
-            for tradingsymbol, execute_at in zip(stockName, place_at):
-                message = f"{tradingsymbol} \nPrice={execute_at}"
-                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={wklyvol_emaconfluence}&text={message}"
-                print(requests.get(url).json())
-            gsheet("wklyvol_emaconfluence", stockName)
-        elif alertName == "dlyvol_emaconfluence":
-            for tradingsymbol, execute_at in zip(stockName, place_at):
-                message = f"{tradingsymbol} \nPrice={execute_at}"
-                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={dlyvol_emaconfluence}&text={message}"
-                print(requests.get(url).json())
-            gsheet("dlyvol_emaconfluence", stockName)
-        elif alertName == "wklyvol_2times_6weeks":
-            for tradingsymbol, execute_at in zip(stockName, place_at):
-                message = f"{tradingsymbol} \nPrice={execute_at}"
-                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={wklyvol_2times_6weeks}&text={message}"
-                print(requests.get(url).json())
-            gsheet("wklyvol_2times_6weeks", stockName)
-        elif alertName == "dlyvol_2times_7days":
-            for tradingsymbol, execute_at in zip(stockName, place_at):
-                message = f"{tradingsymbol} \nPrice={execute_at}"
-                url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={dlyvol_2times_7days}&text={message}"
-                print(requests.get(url).json())
-            gsheet("dlyvol_2times_7days", stockName)
+            gsheet(alertName, stockName)
 
     except Exception as e:
         print(
@@ -168,54 +175,35 @@ def telegramAlertShort():
 
 
 def gsheet(sheetName, list):
+    # Initialize client and worksheets
     sheet = client.open('Rajesh Shetty Alerts')
     sheetOne = sheet.worksheet(sheetName)
-    sheetTwo = sheet.worksheet('Dashboard')
-    cell = sheetOne.find(today)
-    existing_date = sheetTwo.cell(2, 9).value
-    print(cell, today, unformatted_date, existing_date)
-    if cell:
-        print("Column with today's date already exists.")
-    if cell == None:
-        sheetOne.insert_cols([None] * 1, col=3,
-                             value_input_option='RAW', inherit_from_before=False)
-        sheetOne.update_cell(1, 3, today)
-    if existing_date != today:
-        sheetTwo.update_cell(2, 9, today)
-        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(250, 8)}'
-        sheetTwo.batch_clear([range_to_clear])
+    dashboadSheet = sheet.worksheet('Dashboard')
+    # Calculate the next row to update
     next_row = len(sheetOne.col_values(3)) + 1
-
     range_to_update = f'C{next_row}:C{next_row + len(list) - 1}'
+
+    # Update the main sheet
     sheetOne.update([[value] for value in list], range_to_update)
 
-    if sheetName == 'ema_confluence':
-        range_to_update = f'C{next_row}:C{next_row + len(list) - 1}'
-        sheetTwo.update([[value] for value in list], range_to_update)
+    # Mapping of sheet names to column letters
+    column_map = {
+        'ema_confluence': 'C',
+        'pivot_ema_confluence': 'B',
+        'price_volume_analysis': 'A',
+        'wklyvol_emaconfluence': 'E',
+        'dlyvol_emaconfluence': 'D',
+        'wklyvol_2times_6weeks': 'G',
+        'dlyvol_2times_7days': 'F'
+    }
 
-    if sheetName == 'pivot_ema_confluence':
-        range_to_update = f'B{next_row}:B{next_row + len(list) - 1}'
-        sheetTwo.update([[value] for value in list], range_to_update)
+    # Update the dashboard sheet if applicable
+    if sheetName in column_map:
+        col_letter = column_map[sheetName]
+        range_to_update = f'{col_letter}{next_row}:{col_letter}{next_row + len(list) - 1}'
+        dashboadSheet.update([[value] for value in list], range_to_update)
 
-    if sheetName == 'price_volume_analysis':
-        range_to_update = f'A{next_row}:A{next_row + len(list) - 1}'
-        sheetTwo.update([[value] for value in list], range_to_update)
-
-    if sheetName == 'wklyvol_emaconfluence':
-        range_to_update = f'E{next_row}:E{next_row + len(list) - 1}'
-        sheetTwo.update([[value] for value in list], range_to_update)
-
-    if sheetName == 'dlyvol_emaconfluence':
-        range_to_update = f'D{next_row}:D{next_row + len(list) - 1}'
-        sheetTwo.update([[value] for value in list], range_to_update)
-    if sheetName == 'wklyvol_2times_6weeks':
-        range_to_update = f'G{next_row}:G{next_row + len(list) - 1}'
-        sheetTwo.update([[value] for value in list], range_to_update)
-
-    if sheetName == 'dlyvol_2times_7days':
-        range_to_update = f'F{next_row}:F{next_row + len(list) - 1}'
-        sheetTwo.update([[value] for value in list], range_to_update)
-
+    # Return a success message
     return jsonify({"status": 200, "message": "Alert Successfully"})
 
 
