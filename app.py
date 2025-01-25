@@ -60,7 +60,10 @@ dlyvol_2times_7days = '@dlyvol_2times_7days'
 
 @app.route('/test', methods=['GET'])
 def test():
-    temp = f"{unformatted_date}"
+    sheet = client.open('Rajesh Shetty Alerts')
+    sheetTwo = sheet.worksheet('Dashboard')
+    existing_date = sheetTwo.cell(2, 9).value
+    temp = f"Undormatted date:{unformatted_date}, Today:{today} ,Existing date {existing_date}"
     return jsonify({"status": 200, "message": temp})
 
 
