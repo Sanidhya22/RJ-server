@@ -61,10 +61,16 @@ dlyvol_2times_7days = '@dlyvol_2times_7days'
 @app.route('/test', methods=['GET'])
 def test():
     sheet = client.open('Rajesh Shetty Alerts')
+    sheetOne = sheet.worksheet('ema_confluence')
+    cell = sheetOne.find(today)
     sheetTwo = sheet.worksheet('Dashboard')
     existing_date = sheetTwo.cell(2, 9).value
-    temp = f"Undormatted date:{unformatted_date}, Today:{today} ,Existing date {existing_date}"
-    return jsonify({"status": 200, "message": temp})
+    if cell:
+        temp = f"Undormatted date:{unformatted_date}, Today:{today} ,Existing date {existing_date} ,cell :{cell} , First If Block"
+        return jsonify({"status": 200, "message": temp})
+    if cell == None:
+        temp = f"Undormatted date:{unformatted_date}, Today:{today} ,Existing date {existing_date} ,cell :{cell} Second If block"
+        return jsonify({"status": 200, "message": temp})
 
 
 @app.route('/telegramWekhook', methods=['POST'])
