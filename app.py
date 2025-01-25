@@ -73,6 +73,39 @@ def test():
         return jsonify({"status": 200, "message": temp})
 
 
+@app.route('/updateDate', methods=['GET'])
+def updateCell():
+    try:
+        sheet = client.open('Rajesh Shetty Alerts')
+        dashboardSheet = sheet.worksheet('Dashboard')
+        dashboardSheet.update_cell(2, 9, today)
+        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(250, 8)}'
+        dashboardSheet.batch_clear([range_to_clear])
+
+        sheets = [
+            "ema_confluence",
+            "pivot_ema_confluence",
+            "price_volume_analysis",
+            "wklyvol_emaconfluence",
+            "dlyvol_emaconfluence",
+            "wklyvol_2times_6weeks",
+            "dlyvol_2times_7days"
+        ]
+
+        for value in sheets:
+            tempSheet = sheet.worksheet(value)
+            tempSheet.insert_cols([None] * 1, col=3,
+                                  value_input_option='RAW', inherit_from_before=False)
+            tempSheet.update_cell(1, 3, today)
+
+    except Exception as e:
+        print(
+            f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+        return jsonify({"status": 400, "message": "Something went wrong"})
+
+    return jsonify({"status": 200, "message": 'Success'})
+
+
 @app.route('/telegramWekhook', methods=['POST'])
 def telegramAlertShort():
     try:
