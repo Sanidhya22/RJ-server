@@ -59,7 +59,7 @@ dlyvol_2times_7days = '@dlyvol_2times_7days'
 
 
 @app.route('/test', methods=['GET'])
-def telegramAlertShort():
+def test():
     temp = f"{unformatted_date}"
     return jsonify({"status": 200, "message": temp})
 
