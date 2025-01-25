@@ -44,9 +44,9 @@ config = Config()
 unformatted_date = datetime.now(timezone("Asia/Kolkata"))
 
 # Format the datetime object to a string in the format YYYY-MM-DD
-# today = unformatted_date.strftime('%Y-%m-%d')
+today = unformatted_date.strftime('%Y-%m-%d')
 
-today = '2025-01-24'
+# today = '2025-01-24'
 
 ema_confluence = "@ema_confluence"
 pivot_ema_confluence = "@pivot_ema_confluence"
@@ -56,6 +56,12 @@ wklyvol_emaconfluence = '@wklyvol_emaconfluence'
 dlyvol_emaconfluence = '@dlyvol_emaconfluence'
 wklyvol_2times_6weeks = '@wklyvol_2times_6weeks'
 dlyvol_2times_7days = '@dlyvol_2times_7days'
+
+
+@app.route('/test', methods=['GET'])
+def telegramAlertShort():
+    temp = f"{unformatted_date}"
+    return jsonify({"status": 200, "message": temp})
 
 
 @app.route('/telegramWekhook', methods=['POST'])
