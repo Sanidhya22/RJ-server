@@ -40,11 +40,6 @@ client = gspread.authorize(creds)
 app = Flask(__name__)
 config = Config()
 
-# today = date.today().isoformat()
-unformatted_date = datetime.now(timezone("Asia/Kolkata"))
-
-# Format the datetime object to a string in the format YYYY-MM-DD
-today = unformatted_date.strftime('%Y-%m-%d')
 
 ema_confluence = "@ema_confluence"
 pivot_ema_confluence = "@pivot_ema_confluence"
@@ -68,6 +63,8 @@ CHAT_IDS = {
 
 @app.route('/updateDate', methods=['GET'])
 def updateCell():
+    unformatted_date = datetime.now(timezone("Asia/Kolkata"))
+    today = unformatted_date.strftime('%Y-%m-%d')
     try:
         sheet = client.open('Rajesh Shetty Alerts')
         dashboardSheet = sheet.worksheet('Dashboard')
