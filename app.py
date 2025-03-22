@@ -49,6 +49,8 @@ wklyvol_emaconfluence = '@wklyvol_emaconfluence'
 dlyvol_emaconfluence = '@dlyvol_emaconfluence'
 wklyvol_2times_6weeks = '@wklyvol_2times_6weeks'
 dlyvol_2times_7days = '@dlyvol_2times_7days'
+CPR_POC_CASH = '@CPR_POC_CASH'
+CPR_POC_FNO = '@CPR_POC'
 
 CHAT_IDS = {
     "ema_confluence": ema_confluence,
@@ -57,7 +59,10 @@ CHAT_IDS = {
     "wklyvol_emaconfluence": wklyvol_emaconfluence,
     "dlyvol_emaconfluence": dlyvol_emaconfluence,
     "wklyvol_2times_6weeks": wklyvol_2times_6weeks,
-    "dlyvol_2times_7days": dlyvol_2times_7days
+    "dlyvol_2times_7days": dlyvol_2times_7days,
+    "CPR_POC_CASH": CPR_POC_CASH,
+    "CPR_POC_FNO": CPR_POC_FNO,
+
 }
 
 
@@ -79,7 +84,9 @@ def updateCell():
             "wklyvol_emaconfluence",
             "dlyvol_emaconfluence",
             "wklyvol_2times_6weeks",
-            "dlyvol_2times_7days"
+            "dlyvol_2times_7days",
+            'CPR_POC_CASH',
+            'CPR_POC_FNO'
         ]
 
         for value in sheets:
@@ -135,20 +142,23 @@ def gsheet(sheetName, list):
 
     # Mapping of sheet names to column letters
     column_map = {
-        'ema_confluence': 'C',
-        'pivot_ema_confluence': 'B',
-        'price_volume_analysis': 'A',
-        'wklyvol_emaconfluence': 'E',
-        'dlyvol_emaconfluence': 'D',
-        'wklyvol_2times_6weeks': 'G',
-        'dlyvol_2times_7days': 'F'
+        'ema_confluence': 'E',
+        'pivot_ema_confluence': 'D',
+        'price_volume_analysis': 'C',
+        'wklyvol_emaconfluence': 'G',
+        'dlyvol_emaconfluence': 'F',
+        'wklyvol_2times_6weeks': 'I',
+        'dlyvol_2times_7days': 'H',
+        "CPR_POC_FNO": 'A',
+        "CPR_POC_CASH": 'B'
     }
 
     # Update the dashboard sheet if applicable
     if sheetName in column_map:
         col_letter = column_map[sheetName]
-        range_to_update = f'{col_letter}{next_row}:{col_letter}{next_row + len(list) - 1}'
-        dashboadSheet.update([[value] for value in list], range_to_update)
+        range_to_update_dashboard = f'{col_letter}{next_row}:{col_letter}{next_row + len(list) - 1}'
+        dashboadSheet.update([[value] for value in list],
+                             range_to_update_dashboard)
 
     # Return a success message
     return jsonify({"status": 200, "message": "Alert Successfully"})
