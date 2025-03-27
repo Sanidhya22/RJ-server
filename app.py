@@ -73,8 +73,8 @@ def updateCell():
     try:
         sheet = client.open('Rajesh Shetty Alerts')
         dashboardSheet = sheet.worksheet('Dashboard')
-        dashboardSheet.update_cell(2, 9, today)
-        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(250, 8)}'
+        dashboardSheet.update_cell(2, 11, today)
+        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(250, 9)}'
         dashboardSheet.batch_clear([range_to_clear])
 
         sheets = [
