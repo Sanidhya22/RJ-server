@@ -51,6 +51,7 @@ wklyvol_2times_6weeks = '@wklyvol_2times_6weeks'
 dlyvol_2times_7days = '@dlyvol_2times_7days'
 CPR_POC_CASH = '@CPR_POC_CASH'
 CPR_POC_FNO = '@CPR_POC'
+NARROW_CPR = '@NARROW_CPR'
 
 CHAT_IDS = {
     "ema_confluence": ema_confluence,
@@ -62,6 +63,7 @@ CHAT_IDS = {
     "dlyvol_2times_7days": dlyvol_2times_7days,
     "CPR_POC_CASH": CPR_POC_CASH,
     "CPR_POC_FNO": CPR_POC_FNO,
+    "NARROW D/W/M CPR": NARROW_CPR
 
 }
 
@@ -73,8 +75,8 @@ def updateCell():
     try:
         sheet = client.open('Rajesh Shetty Alerts')
         dashboardSheet = sheet.worksheet('Dashboard')
-        dashboardSheet.update_cell(2, 11, today)
-        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(250, 9)}'
+        dashboardSheet.update_cell(2, 12, today)
+        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(250, 10)}'
         dashboardSheet.batch_clear([range_to_clear])
 
         sheets = [
@@ -87,6 +89,7 @@ def updateCell():
             "dlyvol_2times_7days",
             'CPR_POC_CASH',
             'CPR_POC_FNO'
+            'NARROW D/W/M CPR'
         ]
 
         for value in sheets:
@@ -118,6 +121,7 @@ def telegramAlertShort():
                 message = f"{tradingsymbol} \nPrice={execute_at}"
                 url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendMessage?chat_id={chat_id}&text={message}"
                 print(requests.get(url).json())
+            print(f"Updating dashboard sheet for {alertName}")
             gsheet(alertName, stockName)
 
     except Exception as e:
@@ -142,19 +146,21 @@ def gsheet(sheetName, list):
 
     # Mapping of sheet names to column letters
     column_map = {
-        'ema_confluence': 'E',
-        'pivot_ema_confluence': 'D',
-        'price_volume_analysis': 'C',
+        'ema_confluence': 'F',
+        'pivot_ema_confluence': 'E',
+        'price_volume_analysis': 'D',
         'wklyvol_emaconfluence': 'G',
-        'dlyvol_emaconfluence': 'F',
-        'wklyvol_2times_6weeks': 'I',
-        'dlyvol_2times_7days': 'H',
-        "CPR_POC_FNO": 'A',
-        "CPR_POC_CASH": 'B'
+        'dlyvol_emaconfluence': 'G',
+        'wklyvol_2times_6weeks': 'J',
+        'dlyvol_2times_7days': 'I',
+        "CPR_POC_FNO": 'B',
+        "CPR_POC_CASH": 'C',
+        'NARROW D/W/M CPR': 'A'
     }
-
+    print(f"Updating dashboard sheet for {sheetName}")
     # Update the dashboard sheet if applicable
     if sheetName in column_map:
+        print(f"Updating dashboard sheet for {sheetName}")
         col_letter = column_map[sheetName]
         range_to_update_dashboard = f'{col_letter}{next_row}:{col_letter}{next_row + len(list) - 1}'
         dashboadSheet.update([[value] for value in list],
