@@ -149,7 +149,7 @@ def gsheet(sheetName, list):
         'ema_confluence': 'F',
         'pivot_ema_confluence': 'E',
         'price_volume_analysis': 'D',
-        'wklyvol_emaconfluence': 'G',
+        'wklyvol_emaconfluence': 'H',
         'dlyvol_emaconfluence': 'G',
         'wklyvol_2times_6weeks': 'J',
         'dlyvol_2times_7days': 'I',
