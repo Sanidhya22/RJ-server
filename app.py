@@ -89,7 +89,7 @@ def updateCell():
             "dlyvol_2times_7days",
             'CPR_POC_CASH',
             'CPR_POC_FNO',
-            'NARROW D/W/M CPR',
+            'NARROW D/W/M CPR'
         ]
 
         for value in sheets:
