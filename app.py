@@ -52,6 +52,7 @@ dlyvol_2times_7days = '@dlyvol_2times_7days'
 CPR_POC_CASH = '@CPR_POC_CASH'
 CPR_POC_FNO = '@CPR_POC'
 NARROW_CPR = '@NARROW_CPR'
+INSIDECAMERILLA = '@INSIDECAMERILLA'
 
 CHAT_IDS = {
     "ema_confluence": ema_confluence,
@@ -63,7 +64,8 @@ CHAT_IDS = {
     "dlyvol_2times_7days": dlyvol_2times_7days,
     "CPR_POC_CASH": CPR_POC_CASH,
     "CPR_POC_FNO": CPR_POC_FNO,
-    "NARROW D/W/M CPR": NARROW_CPR
+    "NARROW D/W/M CPR": NARROW_CPR,
+    "INSIDECAMERILLA": INSIDECAMERILLA
 
 }
 
@@ -75,8 +77,8 @@ def updateCell():
     try:
         sheet = client.open('Rajesh Shetty Alerts')
         dashboardSheet = sheet.worksheet('Dashboard')
-        dashboardSheet.update_cell(2, 12, today)
-        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(250, 10)}'
+        dashboardSheet.update_cell(2, 13, today)
+        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(250, 11)}'
         dashboardSheet.batch_clear([range_to_clear])
 
         sheets = [
@@ -89,7 +91,8 @@ def updateCell():
             "dlyvol_2times_7days",
             'CPR_POC_CASH',
             'CPR_POC_FNO',
-            'NARROW D/W/M CPR'
+            'NARROW D/W/M CPR',
+            "INSIDECAMERILLA"
         ]
 
         for value in sheets:
@@ -155,7 +158,8 @@ def gsheet(sheetName, list):
         'dlyvol_2times_7days': 'I',
         "CPR_POC_FNO": 'B',
         "CPR_POC_CASH": 'C',
-        'NARROW D/W/M CPR': 'A'
+        'NARROW D/W/M CPR': 'A',
+        'INSIDECAMERILLA': 'K'
     }
     print(f"Updating dashboard sheet for {sheetName}")
     # Update the dashboard sheet if applicable
