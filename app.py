@@ -52,7 +52,7 @@ dlyvol_2times_7days = '@dlyvol_2times_7days'
 CPR_POC_CASH = '@CPR_POC_CASH'
 CPR_POC_FNO = '@CPR_POC'
 NARROW_CPR = '@NARROW_CPR'
-INSIDECAMERILLA = '@INSIDECAMERILLA'
+INSIDECAMERILLA = '@inside_camerilla'
 
 CHAT_IDS = {
     "ema_confluence": ema_confluence,
