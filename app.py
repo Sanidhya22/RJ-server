@@ -43,7 +43,6 @@ config = Config()
 
 ema_confluence = "@ema_confluence"
 pivot_ema_confluence = "@pivot_ema_confluence"
-
 price_volume_analysis = '@price_volume_analysis'
 wklyvol_emaconfluence = '@wklyvol_emaconfluence'
 dlyvol_emaconfluence = '@dlyvol_emaconfluence'
@@ -55,23 +54,22 @@ NARROW_CPR = '@NARROW_CPR'
 INSIDECAMERILLA = '@inside_camerilla'
 
 CHAT_IDS = {
-    "ema_confluence": ema_confluence,
-    "pivot_ema_confluence": pivot_ema_confluence,
-    "price_volume_analysis": price_volume_analysis,
-    "wklyvol_emaconfluence": wklyvol_emaconfluence,
-    "dlyvol_emaconfluence": dlyvol_emaconfluence,
-    "wklyvol_2times_6weeks": wklyvol_2times_6weeks,
-    "dlyvol_2times_7days": dlyvol_2times_7days,
-    "CPR_POC_CASH": CPR_POC_CASH,
-    "CPR_POC_FNO": CPR_POC_FNO,
-    "NARROW D/W/M CPR": NARROW_CPR,
-    "INSIDECAMERILLA": INSIDECAMERILLA
-
+    "ema_confluence": "@ema_confluence",
+    "pivot_ema_confluence": "@pivot_ema_confluence",
+    "price_volume_analysis": "@price_volume_analysis",
+    "wklyvol_emaconfluence": "@wklyvol_emaconfluence",
+    "dlyvol_emaconfluence": "@dlyvol_emaconfluence",
+    "wklyvol_2times_6weeks": "@wklyvol_2times_6weeks",
+    "dlyvol_2times_7days": "@dlyvol_2times_7days",
+    "CPR_POC_CASH": "@CPR_POC_CASH",
+    "CPR_POC_FNO": "@CPR_POC",
+    "NARROW D/W/M CPR": "@NARROW_CPR",
+    "INSIDECAMERILLA": "@inside_camerilla"
 }
 
 
-@app.route('/updateDate', methods=['GET'])
-def updateCell():
+@app.route('/updateDashboard', methods=['GET'])
+def updateDashboard():
     unformatted_date = datetime.now(timezone("Asia/Kolkata"))
     today = unformatted_date.strftime('%Y-%m-%d')
     try:
@@ -81,6 +79,20 @@ def updateCell():
         range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(250, 11)}'
         dashboardSheet.batch_clear([range_to_clear])
 
+        return jsonify({"status": 200, "message": 'Dashboard updated successfully'})
+
+    except Exception as e:
+        print(
+            f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+        return jsonify({"status": 400, "message": "Failed to update dashboard"})
+
+
+@app.route('/updateSheets', methods=['GET'])
+def updateSheets():
+    unformatted_date = datetime.now(timezone("Asia/Kolkata"))
+    today = unformatted_date.strftime('%Y-%m-%d')
+    try:
+        sheet = client.open('Rajesh Shetty Alerts')
         sheets = [
             "ema_confluence",
             "pivot_ema_confluence",
@@ -101,12 +113,12 @@ def updateCell():
                                   value_input_option='RAW', inherit_from_before=False)
             tempSheet.update_cell(1, 3, today)
 
+        return jsonify({"status": 200, "message": 'All sheets updated successfully'})
+
     except Exception as e:
         print(
             f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
-        return jsonify({"status": 400, "message": "Something went wrong"})
-
-    return jsonify({"status": 200, "message": 'Success'})
+        return jsonify({"status": 400, "message": "Failed to update sheets"})
 
 
 @app.route('/telegramWekhook', methods=['POST'])
@@ -204,8 +216,8 @@ def createTemplateIndices():
     unformatted_date = datetime.now(timezone("Asia/Kolkata"))
     today = unformatted_date.strftime('%Y-%m-%d')
     try:
-        sheet = client.open('PIVOT BOSS INDICES SHEEET')
-        template_sheet = sheet.worksheet('TEMPLATE INDICES')
+        sheet = client.open('PIVOT BOSS SHEET')
+        template_sheet = sheet.worksheet('Template INDICES')
 
         # Create new sheet name with today's date
         new_sheet_name = f"{today} Indices"
@@ -307,7 +319,7 @@ def bossSheetIndicesS():
         # Get today's date sheet
         unformatted_date = datetime.now(timezone("Asia/Kolkata"))
         today = unformatted_date.strftime('%Y-%m-%d')
-        sheet = client.open('PIVOT BOSS INDICES SHEEET')
+        sheet = client.open('PIVOT BOSS SHEET')
         worksheet = sheet.worksheet(f"{today} Indices")
 
         # Get all stock cells from column A once
