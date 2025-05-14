@@ -41,6 +41,10 @@ app = Flask(__name__)
 config = Config()
 
 
+# Constants for alerts
+PURE_ONLY_CPR = '@PURE_ONLY_CPR'
+D_W_NARROW_CPR = '@D_W_NARROW_CPR'
+W_M_CPR = '@W_M_CPR'
 ema_confluence = "@ema_confluence"
 pivot_ema_confluence = "@pivot_ema_confluence"
 price_volume_analysis = '@price_volume_analysis'
@@ -54,6 +58,9 @@ NARROW_CPR = '@NARROW_CPR'
 INSIDECAMERILLA = '@inside_camerilla'
 
 CHAT_IDS = {
+    "PURE_ONLY_CPR": "@PURE_ONLY_CPR",
+    "D/W NARROW CPR": "@D_W_NARROW_CPR",
+    "W/M NARROW CPR": "@W_M_CPR",
     "ema_confluence": "@ema_confluence",
     "pivot_ema_confluence": "@pivot_ema_confluence",
     "price_volume_analysis": "@price_volume_analysis",
@@ -75,8 +82,8 @@ def updateDashboard():
     try:
         sheet = client.open('Rajesh Shetty Alerts')
         dashboardSheet = sheet.worksheet('Dashboard')
-        dashboardSheet.update_cell(2, 13, today)
-        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(250, 11)}'
+        dashboardSheet.update_cell(2, 16, today)
+        range_to_clear = f'A2:{gspread.utils.rowcol_to_a1(250, 15)}'
         dashboardSheet.batch_clear([range_to_clear])
 
         return jsonify({"status": 200, "message": 'Dashboard updated successfully'})
@@ -89,11 +96,15 @@ def updateDashboard():
 
 @app.route('/updateSheets', methods=['GET'])
 def updateSheets():
+    import time
     unformatted_date = datetime.now(timezone("Asia/Kolkata"))
     today = unformatted_date.strftime('%Y-%m-%d')
     try:
         sheet = client.open('Rajesh Shetty Alerts')
         sheets = [
+            "PURE_ONLY_CPR",
+            "D/W NARROW CPR",
+            "W/M NARROW CPR",
             "ema_confluence",
             "pivot_ema_confluence",
             "price_volume_analysis",
@@ -107,11 +118,43 @@ def updateSheets():
             "INSIDECAMERILLA"
         ]
 
+        failed_sheets = []
         for value in sheets:
-            tempSheet = sheet.worksheet(value)
-            tempSheet.insert_cols([None] * 1, col=3,
-                                  value_input_option='RAW', inherit_from_before=False)
-            tempSheet.update_cell(1, 3, today)
+            try:
+                # Get the worksheet
+                tempSheet = sheet.worksheet(value)
+
+                # Add delay between API calls to avoid rate limiting
+                time.sleep(1)
+
+                # First attempt to insert column
+                try:
+                    tempSheet.insert_cols([None] * 1, col=3,
+                                          value_input_option='RAW', inherit_from_before=False)
+                except Exception as insert_error:
+                    print(
+                        f"First attempt to insert column in {value} failed. Retrying...")
+                    time.sleep(2)  # Wait longer before retry
+                    tempSheet.insert_cols([None] * 1, col=3,
+                                          value_input_option='RAW', inherit_from_before=False)
+
+                # Add delay before updating cell
+                time.sleep(1)
+
+                # Update the cell
+                tempSheet.update_cell(1, 3, today)
+
+                print(f"Successfully updated sheet: {value}")
+
+            except Exception as e:
+                print(f"Error updating sheet {value}: {str(e)}")
+                failed_sheets.append(value)
+                continue
+
+        if failed_sheets:
+            print(
+                f"Failed to update following sheets: {', '.join(failed_sheets)}")
+            return jsonify({"status": 400, "message": f"Some sheets failed to update: {', '.join(failed_sheets)}"})
 
         return jsonify({"status": 200, "message": 'All sheets updated successfully'})
 
@@ -148,33 +191,31 @@ def telegramAlertShort():
 
 
 def gsheet(sheetName, list):
-    # Initialize client and worksheets
     sheet = client.open('Rajesh Shetty Alerts')
     sheetOne = sheet.worksheet(sheetName)
     dashboadSheet = sheet.worksheet('Dashboard')
-    # Calculate the next row to update
     next_row = len(sheetOne.col_values(3)) + 1
     range_to_update = f'C{next_row}:C{next_row + len(list) - 1}'
 
-    # Update the main sheet
     sheetOne.update([[value] for value in list], range_to_update)
 
-    # Mapping of sheet names to column letters
     column_map = {
-        'ema_confluence': 'F',
-        'pivot_ema_confluence': 'E',
-        'price_volume_analysis': 'D',
-        'wklyvol_emaconfluence': 'H',
-        'dlyvol_emaconfluence': 'G',
-        'wklyvol_2times_6weeks': 'J',
-        'dlyvol_2times_7days': 'I',
-        "CPR_POC_FNO": 'B',
-        "CPR_POC_CASH": 'C',
-        'NARROW D/W/M CPR': 'A',
-        'INSIDECAMERILLA': 'K'
+        'PURE_ONLY_CPR': 'A',
+        'D/W NARROW CPR': 'B',
+        'W/M NARROW CPR': 'C',
+        'ema_confluence': 'I',
+        'pivot_ema_confluence': 'H',
+        'price_volume_analysis': 'G',
+        'wklyvol_emaconfluence': 'K',
+        'dlyvol_emaconfluence': 'J',
+        'wklyvol_2times_6weeks': 'M',
+        'dlyvol_2times_7days': 'L',
+        'CPR_POC_FNO': 'E',
+        'CPR_POC_CASH': 'F',
+        'NARROW D/W/M CPR': 'D',
+        'INSIDECAMERILLA': 'N'
     }
-    print(f"Updating dashboard sheet for {sheetName}")
-    # Update the dashboard sheet if applicable
+
     if sheetName in column_map:
         print(f"Updating dashboard sheet for {sheetName}")
         col_letter = column_map[sheetName]
@@ -182,7 +223,6 @@ def gsheet(sheetName, list):
         dashboadSheet.update([[value] for value in list],
                              range_to_update_dashboard)
 
-    # Return a success message
     return jsonify({"status": 200, "message": "Alert Successfully"})
 
 
