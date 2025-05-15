@@ -40,25 +40,8 @@ client = gspread.authorize(creds)
 app = Flask(__name__)
 config = Config()
 
-
-# Constants for alerts
-PURE_ONLY_CPR = '@PURE_ONLY_CPR'
-D_W_NARROW_CPR = '@D_W_NARROW_CPR'
-W_M_CPR = '@W_M_CPR'
-ema_confluence = "@ema_confluence"
-pivot_ema_confluence = "@pivot_ema_confluence"
-price_volume_analysis = '@price_volume_analysis'
-wklyvol_emaconfluence = '@wklyvol_emaconfluence'
-dlyvol_emaconfluence = '@dlyvol_emaconfluence'
-wklyvol_2times_6weeks = '@wklyvol_2times_6weeks'
-dlyvol_2times_7days = '@dlyvol_2times_7days'
-CPR_POC_CASH = '@CPR_POC_CASH'
-CPR_POC_FNO = '@CPR_POC'
-NARROW_CPR = '@NARROW_CPR'
-INSIDECAMERILLA = '@inside_camerilla'
-
 CHAT_IDS = {
-    "PURE_ONLY_CPR": "@PURE_ONLY_CPR",
+    "PURE ONLY CPR": "@PURE_ONLY_CPR",
     "D/W NARROW CPR": "@D_W_NARROW_CPR",
     "W/M NARROW CPR": "@W_M_CPR",
     "ema_confluence": "@ema_confluence",
@@ -102,7 +85,7 @@ def updateSheets():
     try:
         sheet = client.open('Rajesh Shetty Alerts')
         sheets = [
-            "PURE_ONLY_CPR",
+            "PURE ONLY CPR",
             "D/W NARROW CPR",
             "W/M NARROW CPR",
             "ema_confluence",
