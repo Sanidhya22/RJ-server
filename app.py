@@ -200,7 +200,7 @@ def gsheet(sheetName, list):
     sheetOne.update([[value] for value in list], range_to_update)
 
     column_map = {
-        'PURE_ONLY_CPR': 'A',
+        'PURE ONLY CPR': 'A',
         'D/W NARROW CPR': 'B',
         'W/M NARROW CPR': 'C',
         'ema_confluence': 'I',
