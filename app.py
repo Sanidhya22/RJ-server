@@ -47,6 +47,8 @@ def create_app():
     return app
 
 
+# Create the application instance that gunicorn imports
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=False)
