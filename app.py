@@ -79,7 +79,7 @@ def updateDashboard():
 
 @app.route('/updateSheets', methods=['GET'])
 def updateSheets():
-    import time
+    from concurrent.futures import ThreadPoolExecutor, as_completed
     unformatted_date = datetime.now(timezone("Asia/Kolkata"))
     today = unformatted_date.strftime('%Y-%m-%d')
     try:
@@ -101,38 +101,54 @@ def updateSheets():
             "INSIDECAMERILLA"
         ]
 
-        failed_sheets = []
-        for value in sheets:
+        def update_single_sheet(sheet_name):
             try:
-                # Get the worksheet
-                tempSheet = sheet.worksheet(value)
+                tempSheet = sheet.worksheet(sheet_name)
 
-                # Add delay between API calls to avoid rate limiting
-                time.sleep(1)
+                # Batch operations instead of individual calls
+                batch_updates = [
+                    {
+                        'insertDimension': {
+                            'range': {
+                                'sheetId': tempSheet.id,
+                                'dimension': 'COLUMNS',
+                                'startIndex': 2,  # column C
+                                'endIndex': 3
+                            }
+                        }
+                    }
+                ]
 
-                # First attempt to insert column
-                try:
-                    tempSheet.insert_cols([None] * 1, col=3,
-                                          value_input_option='RAW', inherit_from_before=False)
-                except Exception as insert_error:
-                    print(
-                        f"First attempt to insert column in {value} failed. Retrying...")
-                    time.sleep(2)  # Wait longer before retry
-                    tempSheet.insert_cols([None] * 1, col=3,
-                                          value_input_option='RAW', inherit_from_before=False)
+                # Execute all updates in one API call
+                sheet.batch_update({'requests': batch_updates})
 
-                # Add delay before updating cell
-                time.sleep(1)
-
-                # Update the cell
+                # Update the date in the new column
                 tempSheet.update_cell(1, 3, today)
-
-                print(f"Successfully updated sheet: {value}")
-
+                print(f"Successfully updated sheet: {sheet_name}")
+                return (sheet_name, True)
             except Exception as e:
-                print(f"Error updating sheet {value}: {str(e)}")
-                failed_sheets.append(value)
-                continue
+                print(f"Error updating sheet {sheet_name}: {str(e)}")
+                return (sheet_name, False)
+
+        failed_sheets = []
+        # Use ThreadPoolExecutor to process sheets in parallel
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            # Submit all tasks and store future objects
+            future_to_sheet = {executor.submit(
+                update_single_sheet, sheet_name): sheet_name for sheet_name in sheets}
+
+            # Process completed tasks as they finish
+            # Set timeout to 25 seconds to allow for response time
+            for future in as_completed(future_to_sheet, timeout=25):
+                sheet_name = future_to_sheet[future]
+                try:
+                    _, success = future.result()
+                    if not success:
+                        failed_sheets.append(sheet_name)
+                except Exception as e:
+                    print(
+                        f"Sheet {sheet_name} generated an exception: {str(e)}")
+                    failed_sheets.append(sheet_name)
 
         if failed_sheets:
             print(
