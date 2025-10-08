@@ -35,17 +35,17 @@ def gsheet(sheetName, list):
 
     column_map = {
         'PURE ONLY CPR': 'A',
-        'D/W NARROW CPR': 'K',
-        'W/M NARROW CPR': 'L',
-        'ema_confluence': 'E',
-        'pivot_ema_confluence': 'D',
-        'price_volume_analysis': 'F',
-        'wklyvol_emaconfluence': 'I',
-        'dlyvol_emaconfluence': 'G',
-        'wklyvol_2times_6weeks': 'J',
-        'dlyvol_2times_7days': 'H',
         'CPR_POC_FNO': 'B',
         'CPR_POC_CASH': 'C',
+        'pivot_ema_confluence': 'D',
+        'ema_confluence': 'E',
+        'price_volume_analysis': 'F',
+        'dlyvol_emaconfluence': 'G',
+        'dlyvol_2times_7days': 'H',
+        'wklyvol_emaconfluence': 'I',
+        'wklyvol_2times_6weeks': 'J',
+        'D/W NARROW CPR': 'K',
+        'W/M NARROW CPR': 'L',
         'NARROW D/W/M CPR': 'M',
         'INSIDECAMERILLA': 'N'
     }

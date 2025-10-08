@@ -66,26 +66,41 @@ def updateSheets():
                 update_single_sheet, sheet_name): sheet_name for sheet_name in sheets}
 
             # Process completed tasks as they finish
-            # Set timeout to 25 seconds to allow for response time
-            for future in as_completed(future_to_sheet, timeout=25):
-                sheet_name = future_to_sheet[future]
-                try:
-                    _, success = future.result()
-                    if not success:
+            try:
+                # Set timeout to 90 seconds to allow for response time
+                for future in as_completed(future_to_sheet, timeout=90):
+                    sheet_name = future_to_sheet[future]
+                    try:
+                        _, success = future.result()
+                        if not success:
+                            failed_sheets.append(sheet_name)
+                    except Exception as e:
+                        print(
+                            f"Sheet {sheet_name} generated an exception: {str(e)}")
                         failed_sheets.append(sheet_name)
-                except Exception as e:
-                    print(
-                        f"Sheet {sheet_name} generated an exception: {str(e)}")
-                    failed_sheets.append(sheet_name)
+            except TimeoutError:
+                # Identify which sheets did not complete
+                running_sheets = [future_to_sheet[f]
+                                  for f in future_to_sheet if not f.done()]
+                print(
+                    "TimeoutError: The following sheets did not complete in time: "
+                    f"{', '.join(running_sheets)}"
+                )
+                failed_sheets.extend(running_sheets)
 
         if failed_sheets:
+            message = f"Some sheets failed to update: {', '.join(failed_sheets)}"
             print(
                 f"Failed to update following sheets: {', '.join(failed_sheets)}")
-            return jsonify({"status": 400, "message": f"Some sheets failed to update: {', '.join(failed_sheets)}"})
+            return jsonify({"status": 400, "message": message})
 
-        return jsonify({"status": 200, "message": 'All sheets updated successfully'})
+        return jsonify({
+            "status": 200,
+            "message": 'All sheets updated successfully'
+        })
 
     except Exception as e:
         print(
-            f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            f"{type(e).__name__} at line {e.__traceback__.tb_lineno} "
+            f"of {__file__}: {e}")
         return jsonify({"status": 400, "message": "Failed to update sheets"})
