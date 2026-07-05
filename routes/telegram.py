@@ -24,13 +24,17 @@ CHAT_IDS = {
 }
 
 
+def _col_letter_to_index(letter):
+    return ord(letter.upper()) - ord('A') + 1
+
+
 def gsheet(sheetName, list):
     sheet = telegram_bp.client.open('Rajesh Shetty Alerts')
     sheetOne = sheet.worksheet(sheetName)
     dashboardSheet = sheet.worksheet('Dashboard')
-    next_row = len(sheetOne.col_values(3)) + 1
-    range_to_update = f'C{next_row}:C{next_row + len(list) - 1}'
 
+    next_row = max(2, len(sheetOne.col_values(3)) + 1)
+    range_to_update = f'C{next_row}:C{next_row + len(list) - 1}'
     sheetOne.update([[value] for value in list], range_to_update)
 
     column_map = {
@@ -55,7 +59,9 @@ def gsheet(sheetName, list):
     if sheetName in column_map:
         print(f"Updating dashboard sheet for {sheetName}")
         col_letter = column_map[sheetName]
-        range_to_update_dashboard = f'{col_letter}{next_row}:{col_letter}{next_row + len(list) - 1}'
+        dashboard_col_index = _col_letter_to_index(col_letter)
+        dashboard_next_row = max(2, len(dashboardSheet.col_values(dashboard_col_index)) + 1)
+        range_to_update_dashboard = f'{col_letter}{dashboard_next_row}:{col_letter}{dashboard_next_row + len(list) - 1}'
         dashboardSheet.update([[value] for value in list],
                               range_to_update_dashboard)
 
